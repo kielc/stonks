@@ -158,7 +158,7 @@ def update_text(tic):
     )
 
     children = f"""
-        **Current Price:** ${current_price} ({current_time})
+        **Current Price:** ${current_price: ,.2f} ({current_time})
 
         **Market Cap:** {tickers.at[tic, "marketCap"] / 1000000000: ,.3f} $B
 
