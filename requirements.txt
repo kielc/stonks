@@ -1,0 +1,4 @@
+dash=1.19.0
+pandas=1.2.3
+yfinance=0.1.55
+gunicorn=20.0.4

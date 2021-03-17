@@ -1,0 +1,45 @@
+body {
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    background-color: #f7f7f7;
+}
+
+.header {
+    background-color: #7f4a77;
+    padding: 0 0 0 8px;
+}
+
+.emoji {
+    display: inline-block;
+}
+
+.title {
+    color: #fbb53b;
+    font-family: "Ranchers", cursive;
+    font-size: 36px;
+    display: inline-block;
+    padding: 0 0 0 8px;
+}
+
+.dropdown {
+    display: inline-block;
+    vertical-align: middle;
+    width: 160px;
+    padding: 8px 0 0 8px;
+}
+
+.radio {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 8px 0 0 8px;
+}
+
+.graph {
+    width: 912px;
+    padding: 8px 0 0 8px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.text {
+    padding: 8px 0 0 8px;
+}
