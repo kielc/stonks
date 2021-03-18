@@ -1,11 +1,12 @@
 import dash
+import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import yfinance as yf
 from dash.dependencies import Input, Output
 from datetime import datetime, timedelta
-
+from users import USERNAME_PASSWORD_PAIRS
 
 tickers = pd.read_csv("tickers.csv", index_col=0)
 
@@ -22,11 +23,14 @@ for tic in tickers.index:
         ]:
             tickers.at[tic, key] = info[key]
     except:
+        # if info dict cannot be retrieved value in df will be nan
         pass
 
 for column in ["notes", "sector", "industry", "currency"]:
     tickers[column].fillna("", inplace=True)
 tickers["shortName"].fillna(tickers.index.to_series(), inplace=True)
+
+# empty string or nan date value would cause error when converting to datetime
 tickers["purchase dates"].fillna("2100-01-01", inplace=True)
 tickers["purchase dates"] = tickers["purchase dates"].apply(
     lambda dates: [datetime.strptime(date, "%Y-%m-%d") for date in dates.split()]
@@ -47,7 +51,7 @@ external_stylesheets = [
 ]
 
 app = dash.Dash(__name__, title="Stonks!", external_stylesheets=external_stylesheets)
-
+auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
 server = app.server
 
 app.layout = html.Div(
