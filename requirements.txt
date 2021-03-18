@@ -1,5 +1,5 @@
 dash==1.19.0
-dash-auth=1.4.1
+dash-auth==1.4.1
 pandas==1.2.3
 yfinance==0.1.55
 gunicorn==20.0.4
