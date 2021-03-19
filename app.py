@@ -1,3 +1,6 @@
+import pickle
+from datetime import datetime, timedelta
+
 import dash
 import dash_auth
 import dash_core_components as dcc
@@ -5,37 +8,12 @@ import dash_html_components as html
 import pandas as pd
 import yfinance as yf
 from dash.dependencies import Input, Output
-from datetime import datetime, timedelta
+
 from users import USERNAME_PASSWORD_PAIRS
 
-tickers = pd.read_csv("tickers.csv", index_col=0)
 
-for tic in tickers.index:
-    try:
-        info = yf.Ticker(tic).info
-        for key in [
-            "shortName",
-            "sector",
-            "industry",
-            "marketCap",
-            "dividendYield",
-            "currency",
-        ]:
-            tickers.at[tic, key] = info[key]
-    except:
-        # if info dict cannot be retrieved value in df will be nan
-        pass
-
-for column in ["notes", "sector", "industry", "currency"]:
-    tickers[column].fillna("", inplace=True)
-tickers["shortName"].fillna(tickers.index.to_series(), inplace=True)
-
-# empty string or nan date value would cause error when converting to datetime
-tickers["purchase dates"].fillna("2100-01-01", inplace=True)
-tickers["purchase dates"] = tickers["purchase dates"].apply(
-    lambda dates: [datetime.strptime(date, "%Y-%m-%d") for date in dates.split()]
-)
-tickers.sort_values(["sector", "industry", "tic"], inplace=True)
+with open("tickers.pickle", "rb") as f:
+    tickers = pickle.load(f)
 
 periods = ["1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 
@@ -78,7 +56,7 @@ app.layout = html.Div(
                 dcc.RadioItems(
                     id="period-select",
                     options=[{"label": period, "value": period} for period in periods],
-                    value="6mo",
+                    value="2y",
                 ),
             ],
             className="radio",
@@ -158,7 +136,7 @@ def update_text(tic):
         yf.Ticker(tic)
         .history(period="1d", interval="1m")
         .iloc[-1]
-        .name.strftime("%b %d %H:%M %Z")
+        .name.strftime("%b %d %-I:%M %p %Z")
     )
 
     children = f"""
