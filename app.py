@@ -1,4 +1,4 @@
-import pickle
+import os
 from datetime import datetime, timedelta
 
 import dash
@@ -9,11 +9,10 @@ import pandas as pd
 import yfinance as yf
 from dash.dependencies import Input, Output
 
-from users import USERNAME_PASSWORD_PAIRS
 
+USERNAME_PASSWORD_PAIRS = {os.environ["AUTH_USER"]: os.environ["AUTH_PASS"]}
 
-with open("tickers.pickle", "rb") as f:
-    tickers = pickle.load(f)
+tickers = pd.read_pickle("s3://stonks-kmc/tickers_data.pickle")
 
 periods = ["1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 

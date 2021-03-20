@@ -1,11 +1,12 @@
-import pickle
 from datetime import datetime, timedelta
 
 import pandas as pd
+import s3fs
 import yfinance as yf
 
 
-tickers = pd.read_csv("tickers.csv", index_col=0)
+# aws s3 keys set as environment variables
+tickers = pd.read_csv("s3://stonks-kmc/tickers.csv", index_col=0)
 
 for tic in tickers.index:
     try:
@@ -39,5 +40,4 @@ tickers["purchase dates"] = tickers["purchase dates"].apply(
 
 tickers.sort_values(["sector", "industry", "tic"], inplace=True)
 
-with open("tickers.pickle", "wb") as f:
-    pickle.dump(tickers, f)
+tickers.to_pickle("s3://stonks-kmc/tickers_data.pickle")
