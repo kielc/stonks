@@ -81,7 +81,7 @@ app.layout = html.Div(
     [Input("ticker-select", "value"), Input("period-select", "value")],
 )
 def update_graph(tic, period):
-    df = yf.Ticker(tic).history(period=period)
+    df = yf.Ticker(tic).history(period=period, actions=False)
     purchase_dates = [
         date for date in tickers.loc[tic, "purchase dates"] if date in df.index
     ]
@@ -130,24 +130,47 @@ def update_graph(tic, period):
 
 @app.callback(Output("text", "children"), [Input("ticker-select", "value")])
 def update_text(tic):
-    current_price = yf.Ticker(tic).history(period="1d", interval="1m").iloc[-1]["Close"]
-    current_time = (
-        yf.Ticker(tic)
-        .history(period="1d", interval="1m")
-        .iloc[-1]
-        .name.strftime("%b %d %-I:%M %p %Z")
-    )
+    current = current_price(tic)
 
     children = f"""
-        **Current Price:** ${current_price: ,.2f} ({current_time})
+        **Current Price:** ${current[0]:,.2f} ({current[1]}) ({current[2]:+.2%})
 
-        **Market Cap:** {tickers.at[tic, "marketCap"] / 1000000000: ,.3f} $B
+        **Market Cap:** {tickers.at[tic, "marketCap"] / 1000000000:,.3f} $B
 
-        **Dividend Yield:** {tickers.at[tic, "dividendYield"]: .2%}
+        **Dividend Yield:** {tickers.at[tic, "dividendYield"]:.2%}
 
         {tickers.at[tic, "notes"]}
     """
     return children
+
+
+def current_price(tic):
+    """Get current stock price
+
+    Parameters
+    ----------
+    tic : str
+        stock ticker
+
+    Returns
+    -------
+    (float, str, float)
+        (current price, date/time of current price, fractional change vs last close)
+
+    """
+    df_day = yf.Ticker(tic).history(period="5d", actions=False)
+    df_min = yf.Ticker(tic).history(period="1d", interval="1m", actions=False)
+
+    if df_day.iloc[-1].name.date() == df_min.iloc[-1].name.date():
+        price = df_day.iloc[-1]["Close"]
+        time = df_day.iloc[-1].name.date().strftime("%b %d ") + "at close"
+        change = (price / df_day.iloc[-2]["Close"]) - 1
+    else:
+        price = df_min.iloc[-1]["Close"]
+        time = df_min.iloc[-1].name.strftime("%b %d %-I:%M %p %Z")
+        change = (price / df_day.iloc[-1]["Close"]) - 1
+
+    return (price, time, change)
 
 
 if __name__ == "__main__":

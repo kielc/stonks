@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
-import s3fs
 import yfinance as yf
 
 
