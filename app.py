@@ -161,14 +161,10 @@ def current_price(tic):
     df_day = yf.Ticker(tic).history(period="5d", actions=False)
     df_min = yf.Ticker(tic).history(period="1d", interval="1m", actions=False)
 
-    if df_day.iloc[-1].name.date() == df_min.iloc[-1].name.date():
-        price = df_day.iloc[-1]["Close"]
-        time = df_day.iloc[-1].name.strftime("%b %d ") + "at close"
-        change = (price / df_day.iloc[-2]["Close"]) - 1
-    else:
-        price = df_min.iloc[-1]["Close"]
-        time = df_min.iloc[-1].name.strftime("%b %d %-I:%M %p %Z")
-        change = (price / df_day.iloc[-1]["Close"]) - 1
+    df_day.iloc[-1].name.date() == df_min.iloc[-1].name.date()
+    price = df_day.iloc[-1]["Close"]
+    time = df_min.iloc[-1].name.strftime("%b %d %-I:%M %p %Z")
+    change = (price / df_day.iloc[-2]["Close"]) - 1
 
     return (price, time, change)
 
