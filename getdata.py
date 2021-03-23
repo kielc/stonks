@@ -23,7 +23,18 @@ for tic in tickers.index:
         # if info dict cannot be retrieved value in df will be nan
         pass
 
-# replace with empty string so that nan isnt displayed on graph or notes section
+# sort before replacing nan values so they are last in the sort order
+tickers.sort_values(["sector", "industry", "tic"], inplace=True, na_position="last")
+
+# move stock index tickers to the beginning
+tickers = pd.concat(
+    [
+        tickers.loc[tickers.index.str.startswith("^")],
+        tickers.loc[~tickers.index.str.startswith("^")],
+    ]
+)
+
+# replace with empty string so that nan isn't displayed on graph or for empty notes
 for column in ["notes", "sector", "industry", "currency"]:
     tickers[column].fillna("", inplace=True)
 
@@ -36,7 +47,5 @@ tickers["purchase dates"].fillna("2100-01-01", inplace=True)
 tickers["purchase dates"] = tickers["purchase dates"].apply(
     lambda dates: [datetime.strptime(date, "%Y-%m-%d") for date in dates.split()]
 )
-
-tickers.sort_values(["sector", "industry", "tic"], inplace=True)
 
 tickers.to_pickle("s3://stonks-kmc/tickers_data.pickle")

@@ -163,7 +163,7 @@ def current_price(tic):
 
     if df_day.iloc[-1].name.date() == df_min.iloc[-1].name.date():
         price = df_day.iloc[-1]["Close"]
-        time = df_day.iloc[-1].name.date().strftime("%b %d ") + "at close"
+        time = df_day.iloc[-1].name.strftime("%b %d ") + "at close"
         change = (price / df_day.iloc[-2]["Close"]) - 1
     else:
         price = df_min.iloc[-1]["Close"]
