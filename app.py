@@ -7,8 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import yfinance as yf
-from dash.dependencies import Input, Output
-
+from dash.dependencies import Input, Output, State
 
 USERNAME_PASSWORD_PAIRS = {os.environ["AUTH_USER"]: os.environ["AUTH_PASS"]}
 
@@ -49,6 +48,26 @@ app.layout = html.Div(
                 ),
             ],
             className="dropdown",
+        ),
+        html.Div(
+            [
+                html.Button(
+                    id="prev",
+                    children="Prev",
+                    className="button",
+                ),
+            ],
+            className="button-div",
+        ),
+        html.Div(
+            [
+                html.Button(
+                    id="next",
+                    children="Next",
+                    className="button",
+                ),
+            ],
+            className="button-div",
         ),
         html.Div(
             [
@@ -144,6 +163,29 @@ def update_text(tic):
     return children
 
 
+@app.callback(
+    Output("ticker-select", "value"),
+    [Input("prev", "n_clicks"), Input("next", "n_clicks")],
+    [State("ticker-select", "value"), State("ticker-select", "options")],
+)
+def button(prev_clicks, next_clicks, tic, options):
+    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
+
+    tickers = [d["value"] for d in options]
+    index = tickers.index(tic)
+
+    if prev_clicks is not None or next_clicks is not None:
+        if "prev" in changed_id:
+            index -= 1
+        elif "next" in changed_id:
+            if index == len(tickers) - 1:
+                index = 0
+            else:
+                index += 1
+
+    return tickers[index]
+
+
 def current_price(tic):
     """Get current stock price
 
@@ -161,7 +203,6 @@ def current_price(tic):
     df_day = yf.Ticker(tic).history(period="5d", actions=False)
     df_min = yf.Ticker(tic).history(period="1d", interval="1m", actions=False)
 
-    df_day.iloc[-1].name.date() == df_min.iloc[-1].name.date()
     price = df_day.iloc[-1]["Close"]
     time = df_min.iloc[-1].name.strftime("%b %d %-I:%M %p %Z")
     change = (price / df_day.iloc[-2]["Close"]) - 1
