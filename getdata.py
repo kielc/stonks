@@ -1,11 +1,14 @@
+import os
 from datetime import datetime, timedelta
 
 import pandas as pd
 import yfinance as yf
 
 
+S3_BUCKET = os.environ["S3_BUCKET"]
+
 # aws s3 keys set as environment variables
-tickers = pd.read_csv("s3://stonks-kmc/tickers.csv", index_col=0)
+tickers = pd.read_csv(S3_BUCKET + "tickers.csv", index_col=0)
 
 for tic in tickers.index:
     try:
@@ -48,4 +51,4 @@ tickers["purchase dates"] = tickers["purchase dates"].apply(
     lambda dates: [datetime.strptime(date, "%Y-%m-%d") for date in dates.split()]
 )
 
-tickers.to_pickle("s3://stonks-kmc/tickers_data.pickle")
+tickers.to_pickle(S3_BUCKET + "tickers_data.pickle")

@@ -10,8 +10,9 @@ import yfinance as yf
 from dash.dependencies import Input, Output, State
 
 USERNAME_PASSWORD_PAIRS = {os.environ["AUTH_USER"]: os.environ["AUTH_PASS"]}
+S3_BUCKET = os.environ["S3_BUCKET"]
 
-tickers = pd.read_pickle("s3://stonks-kmc/tickers_data.pickle")
+tickers = pd.read_pickle(S3_BUCKET + "tickers_data.pickle")
 
 periods = ["1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 
