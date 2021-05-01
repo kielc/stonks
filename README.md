@@ -11,3 +11,5 @@ Demo app is deployed on Heroku free dyno and will take a minute to load.
 Username: hello  
 Password: world  
 
+### Credits
+Favicon provided by [Twemoji](https://github.com/twitter/twemoji)
